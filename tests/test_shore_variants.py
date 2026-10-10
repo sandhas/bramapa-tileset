@@ -49,7 +49,9 @@ def test_autotile_rules_cover_all_masks(ts: Tileset) -> None:
     for cover, (first, base_id) in VARIANTS.items():
         rule = rules[cover]
         assert rule.default == base_id
-        assert {int(k): v for k, v in rule.masks.items()} == {m: first + m for m in range(16)}
+        # mask 15 (surrounded by the same cover) is the base tile, per tileset.md
+        expected = {m: first + m for m in range(15)} | {15: base_id}
+        assert {int(k): v for k, v in rule.masks.items()} == expected
     assert rules["rio"].default == 21 and set(rules["rio"].masks) == {"0", "5", "10", "15"}
 
 
