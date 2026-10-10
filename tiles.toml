@@ -1,0 +1,264 @@
+# bramapa-base — tileset placeholder (Fase 0)
+#
+# Contrato: bramapa/docs/spec/tileset.md (spec v0).
+# Este arquivo e a fonte da verdade do layout do atlas: `bramapa-tileset generate`
+# le as posicoes (col/row/frames) daqui e desenha o atlas.png correspondente;
+# `bramapa-tileset check` confere que o atlas.png e este arquivo batem.
+#
+# Ids sao u16 compartilhados entre os quatro repositorios. 0 e reservado (vazio).
+#   terrain: 1..19   overlay: 20..39   object: 40..
+
+spec_version = 0
+
+[tileset]
+id = "bramapa-base"
+version = "0.0.1"
+atlas = "atlas.png"
+tile_width = 64
+tile_height = 32
+cell_width = 64
+cell_height = 64
+license = "CC-BY-4.0"
+
+# ---------------------------------------------------------------- terrain (row 0-1)
+
+[[tiles]]
+id = 1
+name = "campo"
+class = "terrain"
+col = 0
+row = 0
+frames = 1
+fps = 0
+cover = "campo"
+
+[[tiles]]
+id = 2
+name = "agua"
+class = "terrain"
+col = 1
+row = 0
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 3
+name = "oceano"
+class = "terrain"
+col = 5
+row = 0
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 4
+name = "floresta"
+class = "terrain"
+col = 9
+row = 0
+frames = 1
+fps = 0
+cover = "floresta"
+
+[[tiles]]
+id = 5
+name = "areia"
+class = "terrain"
+col = 10
+row = 0
+frames = 1
+fps = 0
+cover = "areia"
+
+[[tiles]]
+id = 6
+name = "urbano"
+class = "terrain"
+col = 11
+row = 0
+frames = 1
+fps = 0
+cover = "urbano"
+
+[[tiles]]
+id = 7
+name = "montanha"
+class = "terrain"
+col = 12
+row = 0
+frames = 1
+fps = 0
+cover = "montanha"
+
+[[tiles]]
+id = 8
+name = "savana"
+class = "terrain"
+col = 13
+row = 0
+frames = 1
+fps = 0
+cover = "savana"
+
+[[tiles]]
+id = 9
+name = "agricultura"
+class = "terrain"
+col = 14
+row = 0
+frames = 1
+fps = 0
+cover = "agricultura"
+
+[[tiles]]
+id = 10
+name = "pastagem"
+class = "terrain"
+col = 15
+row = 0
+frames = 1
+fps = 0
+cover = "pastagem"
+
+[[tiles]]
+id = 11
+name = "caatinga"
+class = "terrain"
+col = 0
+row = 1
+frames = 1
+fps = 0
+cover = "caatinga"
+
+[[tiles]]
+id = 12
+name = "pantanal"
+class = "terrain"
+col = 1
+row = 1
+frames = 1
+fps = 0
+cover = "pantanal"
+
+# ---------------------------------------------------------------- overlay (row 2)
+
+[[tiles]]
+id = 20
+name = "rodovia"
+class = "overlay"
+col = 0
+row = 2
+frames = 1
+fps = 0
+cover = "rodovia"
+
+[[tiles]]
+id = 21
+name = "rio"
+class = "overlay"
+col = 1
+row = 2
+frames = 4
+fps = 4
+cover = "rio"
+
+[[tiles]]
+id = 22
+name = "limite_estado"
+class = "overlay"
+col = 5
+row = 2
+frames = 1
+fps = 0
+cover = "limite_estado"
+
+[[tiles]]
+id = 23
+name = "limite_municipio"
+class = "overlay"
+col = 6
+row = 2
+frames = 1
+fps = 0
+cover = "limite_municipio"
+
+[[tiles]]
+id = 24
+name = "limite_pais"
+class = "overlay"
+col = 7
+row = 2
+frames = 1
+fps = 0
+cover = "limite_pais"
+
+[[tiles]]
+id = 25
+name = "ferrovia"
+class = "overlay"
+col = 8
+row = 2
+frames = 1
+fps = 0
+cover = "ferrovia"
+
+# ---------------------------------------------------------------- object (row 3)
+
+[[tiles]]
+id = 40
+name = "arvore"
+class = "object"
+col = 0
+row = 3
+frames = 1
+fps = 0
+
+[[tiles]]
+id = 41
+name = "predio"
+class = "object"
+col = 1
+row = 3
+frames = 1
+fps = 0
+
+[[tiles]]
+id = 42
+name = "casa"
+class = "object"
+col = 2
+row = 3
+frames = 1
+fps = 0
+
+# ---------------------------------------------------------------- autotiling
+# Mascara de 4 bits (N=1, E=2, S=4, W=8) = vizinhos com a MESMA cobertura.
+# No placeholder todas as mascaras apontam para o mesmo tile; a estrutura e o
+# que importa para o pipeline e o motor exercitarem o caminho de autotiling.
+
+[[autotile]]
+cover = "agua"
+default = 2
+[autotile.masks]
+"0" = 2    # isolado
+"5" = 2    # N+S (canal vertical)
+"10" = 2   # E+W (canal horizontal)
+"15" = 2   # cercado
+
+[[autotile]]
+cover = "oceano"
+default = 3
+[autotile.masks]
+"0" = 3
+"15" = 3
+
+[[autotile]]
+cover = "rio"
+default = 21
+[autotile.masks]
+"0" = 21
+"5" = 21
+"10" = 21
+"15" = 21

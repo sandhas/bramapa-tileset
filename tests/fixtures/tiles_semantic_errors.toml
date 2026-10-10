@@ -1,0 +1,51 @@
+# Broken on purpose: several semantic errors in one file.
+spec_version = 0
+
+[tileset]
+id = "bramapa-base"
+version = "0.0.1"
+atlas = "atlas.png"
+tile_width = 64
+tile_height = 32
+cell_width = 64
+cell_height = 64
+license = "CC-BY-4.0"
+
+[[tiles]]            # id 0 is reserved
+id = 0
+name = "vazio"
+class = "terrain"
+col = 0
+row = 0
+cover = "vazio"
+
+[[tiles]]
+id = 1
+name = "campo"
+class = "terrain"
+col = 0
+row = 0            # same cell as tile 0 -> overlap
+cover = "campo"
+
+[[tiles]]            # duplicate id, invalid class
+id = 1
+name = "adesivo"
+class = "decal"
+col = 2
+row = 0
+
+[[tiles]]            # animated but fps = 0
+id = 2
+name = "agua"
+class = "terrain"
+col = 3
+row = 0
+frames = 4
+fps = 0
+cover = "agua"
+
+[[autotile]]         # cover that no tile declares
+cover = "lava"
+default = 99
+[autotile.masks]
+"16" = 1

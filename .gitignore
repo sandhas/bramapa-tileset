@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+.pytest_cache/
+
+# Scratch renders (the committed atlas.png is the only tracked PNG at the root)
+/out/
+*.tmp.png
+
+# Aseprite backups
+src-art/**/*.aseprite~
+src-art/**/_backup/

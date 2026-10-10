@@ -1,0 +1,48 @@
+# Broken on purpose: montanha (id 7) points at col 40, far outside a 1024-px atlas.
+spec_version = 0
+
+[tileset]
+id = "bramapa-base"
+version = "0.0.1"
+atlas = "atlas.png"
+tile_width = 64
+tile_height = 32
+cell_width = 64
+cell_height = 64
+license = "CC-BY-4.0"
+
+[[tiles]]
+id = 1
+name = "campo"
+class = "terrain"
+col = 0
+row = 0
+frames = 1
+fps = 0
+cover = "campo"
+
+[[tiles]]
+id = 2
+name = "agua"
+class = "terrain"
+col = 1
+row = 0
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 7
+name = "montanha"
+class = "terrain"
+col = 40
+row = 0
+frames = 1
+fps = 0
+cover = "montanha"
+
+[[autotile]]
+cover = "agua"
+default = 2
+[autotile.masks]
+"0" = 2
