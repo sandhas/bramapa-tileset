@@ -40,7 +40,7 @@ class Tile:
 @dataclass(frozen=True)
 class Autotile:
     cover: str
-    default: int
+    default: int | None  # None when tiles.toml omits it (then all 16 masks are required)
     masks: dict[str, Any] = field(default_factory=dict)
 
 
@@ -76,7 +76,7 @@ class Tileset:
         return max((t.row + 1 for t in self.tiles), default=0)
 
 
-def _int(value: Any, default: int) -> int:
+def _int(value: Any, default: int | None) -> int | None:
     """Coerce a TOML value to int, keeping obviously wrong types as-is for the checker."""
     if value is None:
         return default
@@ -113,7 +113,7 @@ def load_tileset(path: str | Path) -> Tileset:
     autotiles = [
         Autotile(
             cover=str(raw.get("cover", "")),
-            default=_int(raw.get("default"), 0),
+            default=_int(raw.get("default"), None),
             masks=dict(raw.get("masks", {})),
         )
         for raw in data.get("autotile", [])

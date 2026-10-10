@@ -1,4 +1,4 @@
-# bramapa-base — tileset placeholder (Fase 0)
+# bramapa-base — tileset placeholder (Fase 0 + Fase 1: variantes de autotiling)
 #
 # Contrato: bramapa/docs/spec/tileset.md (spec v0).
 # Este arquivo e a fonte da verdade do layout do atlas: `bramapa-tileset generate`
@@ -7,6 +7,8 @@
 #
 # Ids sao u16 compartilhados entre os quatro repositorios. 0 e reservado (vazio).
 #   terrain: 1..19   overlay: 20..39   object: 40..
+#   variantes de autotiling (terrain): agua 100 + mascara (100..115),
+#   oceano 120 + mascara (120..135). Ver secao "Esclarecimentos v0" da spec.
 
 spec_version = 0
 
@@ -233,26 +235,378 @@ row = 3
 frames = 1
 fps = 0
 
+# -------------------------------------- variantes de litoral (rows 4-7 agua, 8-11 oceano)
+# Nome = <cover>_m<mascara>; id = base + mascara. 4 masks por row, 4 frames cada.
+# Mascara 15 (cercado) e identica ao tile base; existe so para a formula ser pura.
+# Arestas do losango x bit (sx=(x-y)*32, sy=(x+y)*16): N->NE, E->SE, S->SW, W->NW.
+
+[[tiles]]
+id = 100
+name = "agua_m00"
+class = "terrain"
+col = 0
+row = 4
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 101
+name = "agua_m01"
+class = "terrain"
+col = 4
+row = 4
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 102
+name = "agua_m02"
+class = "terrain"
+col = 8
+row = 4
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 103
+name = "agua_m03"
+class = "terrain"
+col = 12
+row = 4
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 104
+name = "agua_m04"
+class = "terrain"
+col = 0
+row = 5
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 105
+name = "agua_m05"
+class = "terrain"
+col = 4
+row = 5
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 106
+name = "agua_m06"
+class = "terrain"
+col = 8
+row = 5
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 107
+name = "agua_m07"
+class = "terrain"
+col = 12
+row = 5
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 108
+name = "agua_m08"
+class = "terrain"
+col = 0
+row = 6
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 109
+name = "agua_m09"
+class = "terrain"
+col = 4
+row = 6
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 110
+name = "agua_m10"
+class = "terrain"
+col = 8
+row = 6
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 111
+name = "agua_m11"
+class = "terrain"
+col = 12
+row = 6
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 112
+name = "agua_m12"
+class = "terrain"
+col = 0
+row = 7
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 113
+name = "agua_m13"
+class = "terrain"
+col = 4
+row = 7
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 114
+name = "agua_m14"
+class = "terrain"
+col = 8
+row = 7
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 115
+name = "agua_m15"
+class = "terrain"
+col = 12
+row = 7
+frames = 4
+fps = 4
+cover = "agua"
+
+[[tiles]]
+id = 120
+name = "oceano_m00"
+class = "terrain"
+col = 0
+row = 8
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 121
+name = "oceano_m01"
+class = "terrain"
+col = 4
+row = 8
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 122
+name = "oceano_m02"
+class = "terrain"
+col = 8
+row = 8
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 123
+name = "oceano_m03"
+class = "terrain"
+col = 12
+row = 8
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 124
+name = "oceano_m04"
+class = "terrain"
+col = 0
+row = 9
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 125
+name = "oceano_m05"
+class = "terrain"
+col = 4
+row = 9
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 126
+name = "oceano_m06"
+class = "terrain"
+col = 8
+row = 9
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 127
+name = "oceano_m07"
+class = "terrain"
+col = 12
+row = 9
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 128
+name = "oceano_m08"
+class = "terrain"
+col = 0
+row = 10
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 129
+name = "oceano_m09"
+class = "terrain"
+col = 4
+row = 10
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 130
+name = "oceano_m10"
+class = "terrain"
+col = 8
+row = 10
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 131
+name = "oceano_m11"
+class = "terrain"
+col = 12
+row = 10
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 132
+name = "oceano_m12"
+class = "terrain"
+col = 0
+row = 11
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 133
+name = "oceano_m13"
+class = "terrain"
+col = 4
+row = 11
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 134
+name = "oceano_m14"
+class = "terrain"
+col = 8
+row = 11
+frames = 4
+fps = 3
+cover = "oceano"
+
+[[tiles]]
+id = 135
+name = "oceano_m15"
+class = "terrain"
+col = 12
+row = 11
+frames = 4
+fps = 3
+cover = "oceano"
+
 # ---------------------------------------------------------------- autotiling
 # Mascara de 4 bits (N=1, E=2, S=4, W=8) = vizinhos com a MESMA cobertura.
-# No placeholder todas as mascaras apontam para o mesmo tile; a estrutura e o
-# que importa para o pipeline e o motor exercitarem o caminho de autotiling.
+# agua e oceano cobrem as 16 mascaras com as variantes de litoral acima
+# (id = base + mascara). rio continua apontando para o mesmo tile: a estrutura
+# e o que importa para o pipeline e o motor exercitarem o caminho de autotiling.
 
 [[autotile]]
 cover = "agua"
 default = 2
 [autotile.masks]
-"0" = 2    # isolado
-"5" = 2    # N+S (canal vertical)
-"10" = 2   # E+W (canal horizontal)
-"15" = 2   # cercado
+"0" = 100
+"1" = 101
+"2" = 102
+"3" = 103
+"4" = 104
+"5" = 105
+"6" = 106
+"7" = 107
+"8" = 108
+"9" = 109
+"10" = 110
+"11" = 111
+"12" = 112
+"13" = 113
+"14" = 114
+"15" = 115
 
 [[autotile]]
 cover = "oceano"
 default = 3
 [autotile.masks]
-"0" = 3
-"15" = 3
+"0" = 120
+"1" = 121
+"2" = 122
+"3" = 123
+"4" = 124
+"5" = 125
+"6" = 126
+"7" = 127
+"8" = 128
+"9" = 129
+"10" = 130
+"11" = 131
+"12" = 132
+"13" = 133
+"14" = 134
+"15" = 135
 
 [[autotile]]
 cover = "rio"

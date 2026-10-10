@@ -1,4 +1,4 @@
-"""Deterministic placeholder atlas for the ``bramapa-base`` tileset (Fase 0).
+"""Deterministic placeholder atlas for the ``bramapa-base`` tileset (Fase 0/1).
 
 Everything here is procedural pixel art at 1x scale: no antialiasing, no RNG.
 The layout (which cell each tile lands on) is read from ``tiles.toml``; this
@@ -24,6 +24,7 @@ Isometric axes on screen: +x of the grid goes down-right with slope 1/2,
 from __future__ import annotations
 
 import io
+import re
 from pathlib import Path
 from typing import Callable
 
@@ -61,6 +62,11 @@ TERRAIN_PALETTE: dict[str, tuple[RGBA, RGBA]] = {
 }
 
 WATER_HIGHLIGHT = {"agua": rgb(126, 176, 232), "oceano": rgb(74, 116, 190), "pantanal": rgb(110, 180, 170)}
+# Shoreline foam for the autotiling variants: (bright crest, softer trough).
+SHORE_FOAM = {
+    "agua": (rgb(214, 236, 250), rgb(170, 210, 242)),
+    "oceano": (rgb(176, 206, 240), rgb(118, 160, 216)),
+}
 
 C_TRANSPARENT = rgb(0, 0, 0, 0)
 C_ROAD = rgb(92, 92, 98)
@@ -235,6 +241,93 @@ def draw_terrain(cell: Canvas, ts: Tileset, tile: Tile, frame: int) -> None:
 
 
 # ----------------------------------------------------------------------------
+# Shoreline autotiling variants (agua / oceano)
+# ----------------------------------------------------------------------------
+#
+# Neighbour mask (spec v0): N = 1 (x, y-1), E = 2 (x+1, y), S = 4 (x, y+1),
+# W = 8 (x-1, y); a bit is SET when that neighbour has the same cover, so a
+# CLEAR bit means "shore on that side" and gets a foam line.
+#
+# Which diamond edge does each neighbour touch? Derive it from the projection
+# rather than from compass intuition. Screen position of grid cell (x, y):
+#
+#     sx = (x - y) * 32        sy = (x + y) * 16
+#
+#     neighbour      grid delta   screen delta   lies to the   touches edge
+#     N  (x, y-1)    (0, -1)      (+32, -16)     upper-right   NE  (upper-right)
+#     E  (x+1, y)    (+1, 0)      (+32, +16)     lower-right   SE  (lower-right)
+#     S  (x, y+1)    (0, +1)      (-32, +16)     lower-left    SW  (lower-left)
+#     W  (x-1, y)    (-1, 0)      (-32, -16)     upper-left    NW  (upper-left)
+#
+# So in cell pixels (diamond centre at (cx, cy)): bit N -> upper & right half,
+# bit E -> lower & right, bit S -> lower & left, bit W -> upper & left.
+
+MASK_N, MASK_E, MASK_S, MASK_W = 1, 2, 4, 8
+SHORE_THICKNESS = 2  # rows; a 2:1 edge then covers 4 px per row
+
+_VARIANT_RE = re.compile(r"^(?P<base>agua|oceano)_m(?P<mask>\d{1,2})$")
+
+
+def shore_variant(tile: Tile) -> tuple[str, int] | None:
+    """``agua_m05`` -> ("agua", 5); ``None`` for every other tile name."""
+    m = _VARIANT_RE.match(tile.name)
+    if m is None:
+        return None
+    mask = int(m.group("mask"))
+    if not 0 <= mask <= 15:
+        raise ValueError(f"tile {tile.id} ({tile.name}): mask {mask} out of range 0..15")
+    return m.group("base"), mask
+
+
+def shore_edges(xs: np.ndarray, ys: np.ndarray, ts: Tileset) -> dict[int, np.ndarray]:
+    """Foam band for each neighbour bit, keyed by the bit (MASK_N, ...)."""
+    cx, cy = ts.cell_width // 2, ts.cell_height - ts.tile_height // 2
+    top = ts.cell_height - ts.tile_height
+    half_w, half_h = ts.tile_width // 2, ts.tile_height // 2
+    t = SHORE_THICKNESS
+    ratio = half_w // half_h
+    outer = iso_diamond(xs, ys, cx, top, half_w, half_h)
+    inner = iso_diamond(xs, ys, cx, top + t, half_w - ratio * t, half_h - t)
+    rim = outer & ~inner
+    upper, right = ys < cy, xs >= cx
+    return {
+        MASK_N: rim & upper & right,  # NE edge
+        MASK_E: rim & ~upper & right,  # SE edge
+        MASK_S: rim & ~upper & ~right,  # SW edge
+        MASK_W: rim & upper & ~right,  # NW edge
+    }
+
+
+def draw_shore(cell: Canvas, ts: Tileset, base_name: str, mask: int, frame: int, frames: int) -> None:
+    """Foam line on every diamond edge whose neighbour bit is CLEAR in ``mask``."""
+    xs, ys = grid(ts.cell_width, ts.cell_height)
+    crest, trough = SHORE_FOAM[base_name]
+    # Crest/trough alternate along the edge and drift with the frame, like the water dashes.
+    period = 8
+    phase = (frame * period) // max(frames, 1)
+    along = ((xs + 2 * ys + phase) // 2) % period  # position along a 2:1 edge
+    for bit, band in shore_edges(xs, ys, ts).items():
+        if mask & bit:
+            continue
+        paint(cell, band, trough)
+        paint(cell, band & (along < 5), crest)
+
+
+def draw_terrain_or_shore(cell: Canvas, ts: Tileset, tile: Tile, frame: int) -> None:
+    variant = shore_variant(tile)
+    if variant is None:
+        draw_terrain(cell, ts, tile, frame)
+        return
+    base_name, mask = variant
+    base = ts.by_name().get(base_name)
+    if base is None:
+        raise ValueError(f"tile {tile.id} ({tile.name}): base tile {base_name!r} not declared")
+    # Same pixels as the base tile (same noise seed, same frame phase), then foam on top.
+    draw_terrain(cell, ts, base, frame)
+    draw_shore(cell, ts, base_name, mask, frame, base.frames)
+
+
+# ----------------------------------------------------------------------------
 # Overlays
 # ----------------------------------------------------------------------------
 
@@ -393,7 +486,7 @@ def draw_object(cell: Canvas, ts: Tileset, tile: Tile, frame: int) -> None:
 
 
 DRAWERS: dict[str, Callable[[Canvas, Tileset, Tile, int], None]] = {
-    "terrain": draw_terrain,
+    "terrain": draw_terrain_or_shore,
     "overlay": draw_overlay,
     "object": draw_object,
 }

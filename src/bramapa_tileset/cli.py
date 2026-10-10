@@ -40,6 +40,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = check(args.tiles, args.atlas)
         if args.quiet:
+            for w in result.warnings:
+                print(f"- WARN {w}")
             for p in result.problems:
                 print(f"- {p}")
         else:

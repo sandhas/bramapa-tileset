@@ -17,6 +17,7 @@ class CheckResult:
     tileset: Tileset | None
     atlas_size: tuple[int, int] | None
     problems: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
     tile_problems: dict[int, list[str]] = field(default_factory=dict)
 
     @property
@@ -27,6 +28,9 @@ class CheckResult:
         self.problems.append(message)
         if tile_id is not None:
             self.tile_problems.setdefault(tile_id, []).append(message)
+
+    def warn(self, message: str) -> None:
+        self.warnings.append(message)
 
 
 def _is_int(v: object) -> bool:
@@ -158,7 +162,10 @@ def check(tiles_toml: str | Path | None = None, atlas: str | Path | None = None)
         seen_at.add(at.cover)
         if at.cover not in covers:
             result.add(f"{label}: no terrain/overlay tile declares this cover")
-        targets = [("default", at.default)] + [(f"masks[{k!r}]", v) for k, v in at.masks.items()]
+        targets = [(f"masks[{k!r}]", v) for k, v in at.masks.items()]
+        if at.default is not None:
+            targets.insert(0, ("default", at.default))
+        present: set[int] = set()
         for k in at.masks:
             try:
                 m = int(k)
@@ -167,6 +174,16 @@ def check(tiles_toml: str | Path | None = None, atlas: str | Path | None = None)
                 continue
             if not 0 <= m <= 15:
                 result.add(f"{label}: mask key {k!r} out of range 0..15")
+            else:
+                present.add(m)
+        # Every mask 0..15 must resolve: either listed explicitly or caught by `default`.
+        missing = sorted(set(range(16)) - present)
+        if missing:
+            shown = ", ".join(map(str, missing))
+            if at.default is None:
+                result.add(f"{label}: no default and masks {shown} are not declared")
+            else:
+                result.warn(f"{label}: masks {shown} not declared, falling back to default {at.default}")
         for what, target in targets:
             if not _is_int(target) or target not in seen_ids:
                 result.add(f"{label}: {what} references unknown tile id {target!r}")
@@ -197,6 +214,10 @@ def format_table(result: CheckResult) -> str:
             )
         lines.append("")
         lines.append(f"autotile covers: {', '.join(a.cover for a in ts.autotiles) or '(none)'}")
+    if result.warnings:
+        lines.append("")
+        lines.append(f"{len(result.warnings)} warning(s):")
+        lines.extend(f"  - WARN {w}" for w in result.warnings)
     if result.problems:
         lines.append("")
         lines.append(f"{len(result.problems)} problem(s):")
